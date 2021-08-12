@@ -18,20 +18,20 @@ class Autoloader
         
         if (preg_match('/^[a-z0-9]+\\\(([a-z0-9]+)(\\\.+|))$/i', $class, $match)) {
             // new namespaced library
-            $file = strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
-        }
+            $f = strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
 
-        foreach ($roots as $r) {
-            if (file_exists($r . '/' . $file)) {
-                $file = $r . '/' . $file;
-                break;
+            foreach ($roots as $r) {
+                if (file_exists($r . '/' . $f)) {
+                    $file = $r . '/' . $f;
+                    break;
+                }
             }
         }
 
         return (!$file ? false : $file);
     }
-    
-    public static function register(array $roots)
+
+    public static function register(array $roots): void
     {
         spl_autoload_register(function ($class) use ($roots) {
             if (($file = self::identify($class, $roots)) !== false) {
