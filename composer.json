@@ -1,0 +1,19 @@
+{
+    "name":         "octris/devel",
+    "type":         "library",
+    "description":  "Libraries useful during development",
+    "keywords":     [],
+    "homepage":     "https://github.com/octris/devel",
+    "license":      "BSD-3-Clause",
+
+    "authors":      [{
+        "name":         "Harald Lapp",
+        "email":        "harald@octris.org"
+    }],
+
+    "autoload":     {
+        "classmap": [
+            "libs/Autoloader.php"
+        ]
+    }
+}
