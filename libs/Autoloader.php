@@ -12,18 +12,27 @@ namespace Octris\Devel;
  */
 class Autoloader
 {
-    public static function identify(string $class, array $roots): string|bool
+    public static function identify(string $class, array $map): string|bool
     {
         $file = '';
-        
-        if (preg_match('/^[a-z0-9]+\\\(([a-z0-9]+)(\\\.+|))$/i', $class, $match)) {
-            // new namespaced library
-            $f = strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
 
-            foreach ($roots as $r) {
-                if (file_exists($r . '/' . $f)) {
-                    $file = $r . '/' . $f;
-                    break;
+        if (preg_match('/^[a-z0-9]+\\\(([a-z0-9]+)(\\\.+|))$/i', $class, $match)) {
+            foreach ($map as $prefix => $path) {
+                if (strpos($class, $prefix) === 0) {
+                    switch (substr_count($prefix, '\\')) {
+                        case 1:
+                            $f = $path . '/' . strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
+                            break;
+                        case 2:
+                        default:
+                            $f = $path . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
+                            break;
+                    }
+
+                    if (file_exists($f)) {
+                        $file = $f;
+                        break;
+                    }
                 }
             }
         }
@@ -31,10 +40,12 @@ class Autoloader
         return (!$file ? false : $file);
     }
 
-    public static function register(array $roots): void
+    public static function register(array $map): void
     {
-        spl_autoload_register(function ($class) use ($roots) {
-            if (($file = self::identify($class, $roots)) !== false) {
+        krsort($map);
+
+        spl_autoload_register(function ($class) use ($map) {
+            if (($file = self::identify($class, $map)) !== false) {
                 require($file);
             }
         }, true, true);
