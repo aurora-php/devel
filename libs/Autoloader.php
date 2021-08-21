@@ -19,14 +19,18 @@ class Autoloader
         if (preg_match('/^[a-z0-9]+\\\(([a-z0-9]+)(\\\.+|))$/i', $class, $match)) {
             foreach ($map as $prefix => $path) {
                 if (strpos($class, $prefix) === 0) {
-                    switch (substr_count($prefix, '\\')) {
-                        case 1:
-                            $f = $path . '/' . strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
-                            break;
-                        case 2:
-                        default:
-                            $f = $path . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
-                            break;
+                    if ($class === $prefix) {
+                        $f = $path . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
+                    } else {
+                        switch (substr_count($prefix, '\\')) {
+                            case 1:
+                                $f = $path . '/' . strtolower($match[2]) . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
+                                break;
+                            case 2:
+                            default:
+                                $f = $path . '/libs/' . str_replace('\\', '/', $match[1]) . '.php';
+                                break;
+                        }
                     }
 
                     if (file_exists($f)) {
